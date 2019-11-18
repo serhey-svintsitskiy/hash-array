@@ -1,0 +1,27 @@
+{
+    "name": "serhey-svintsitskiy/hash-array",
+    "description": "serhey-svintsitskiy/hash-array",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Serhii Svintsitskyi",
+            "email": "sergeys08.sv@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "HashArray\\": "src/HashArray/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "HashArrayTest\\": "test/HashArrayTest/"
+        }
+    }
+}
