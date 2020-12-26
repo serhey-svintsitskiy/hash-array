@@ -23,5 +23,8 @@
         "psr-4": {
             "HashArrayTest\\": "test/HashArrayTest/"
         }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
     }
 }
