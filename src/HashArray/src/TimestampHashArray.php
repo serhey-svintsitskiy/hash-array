@@ -22,8 +22,7 @@ class TimestampHashArray implements TimestampHashArrayInterface
         }
 
         $keyTs = $this->findClosest($key, $timestamp);
-        $value = $this->storage[$key][$keyTs] ?? null;
-        return $value;
+        return $this->storage[$key][$keyTs] ?? null;
     }
 
     /**
@@ -38,18 +37,21 @@ class TimestampHashArray implements TimestampHashArrayInterface
         return $timestamp;
     }
 
-    function findClosest($key, $target)
+    private function findClosest(string $key, $target)
     {
 
         $arr = array_keys($this->storage[$key]);
         $n = count($arr);
         // Corner cases
-        if ($target < $arr[0])
+        if ($target < $arr[0]) {
             return null;
-        if ($target == $arr[0])
+        }
+        if ($target === $arr[0]) {
             return $arr[0];
-        if ($target >= $arr[$n - 1])
+        }
+        if ($target >= $arr[$n - 1]) {
             return $arr[$n - 1];
+        }
 
         // Doing binary search
         $i = 0;
@@ -57,7 +59,7 @@ class TimestampHashArray implements TimestampHashArrayInterface
         $mid = 0;
         while ($i < $j) {
             $mid = ($i + $j) / 2;
-            if ($arr[$mid] == $target) {
+            if ($arr[$mid] === $target) {
                 return $arr[$mid];
             }
 
