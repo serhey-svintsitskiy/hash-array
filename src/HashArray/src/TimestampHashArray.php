@@ -2,13 +2,11 @@
 
 namespace HashArray;
 
+use RuntimeException;
+
 class TimestampHashArray implements TimestampHashArrayInterface
 {
-
-    /**
-     * @var array
-     */
-    protected $storage = [];
+    protected array $storage = [];
 
     /**
      * @param string $key
@@ -18,70 +16,41 @@ class TimestampHashArray implements TimestampHashArrayInterface
     public function get(string $key, int $timestamp)
     {
         if (!isset($this->storage[$key])) {
-            throw new \RuntimeException("Could not find key '{$key}' in the HashArray");
+            throw new RuntimeException("Could not find key '{$key}' in the HashArray");
         }
 
-        $keyTs = $this->findClosest($key, $timestamp);
+        $keyTs = $this->findClosest($timestamp, array_keys($this->storage[$key]));
         return $this->storage[$key][$keyTs] ?? null;
     }
 
-    /**
-     * @param string $key
-     * @param $value
-     * @return int
-     */
-    public function set(string $key, $value): int
+    public function set(string $key, $value, ?int $timestamp = null): int
     {
-        $timestamp = time();
+        $timestamp = $timestamp ?? time();
         $this->storage[$key][$timestamp] = $value;
         return $timestamp;
     }
 
-    private function findClosest(string $key, $target)
+    private function findClosest(int $needle, array $list): ?int
     {
-
-        $arr = array_keys($this->storage[$key]);
-        $n = count($arr);
-        // Corner cases
-        if ($target < $arr[0]) {
+        if (empty($list) || $needle < $list[0]) {
             return null;
         }
-        if ($target === $arr[0]) {
-            return $arr[0];
-        }
-        if ($target >= $arr[$n - 1]) {
-            return $arr[$n - 1];
-        }
-
-        // Doing binary search
-        $i = 0;
-        $j = $n;
-        $mid = 0;
-        while ($i < $j) {
-            $mid = ($i + $j) / 2;
-            if ($arr[$mid] === $target) {
-                return $arr[$mid];
-            }
-
-            /* If target is less than array element, then search in left */
-            if ($target < $arr[$mid]) {
-                // If target is greater than previous
-                // to mid, return closest of two
-                if ($mid > 0 && $target > $arr[$mid - 1]){
-                    return $arr[$mid - 1];
-                }
-                /* Repeat for left half */
-                $j = $mid;
-            } // If target is greater than mid
-            else {
-                if ($mid < $n - 1 &&  $target < $arr[$mid + 1]){
-                    return $arr[$mid];
-                }
-                // update i
-                $i = $mid + 1;
-            }
-        }
-        // Only single element left after search
-        return $arr[$mid];
+        $diff = static function($el) use ($needle) {
+            return $needle - $el >= 0 ? $needle - $el : INF;
+        };
+        
+        $interval = array_map($diff, $list);
+        asort($interval);
+        $closest = key($interval);
+//        $closest = $list[0];
+//        foreach ($list as $el) {
+//            if ($needle - $el < 0) {
+//                break;
+//            }
+//            $closest = min($closest, $el);
+//        }
+//        
+//        return $closest;
+        return $list[$closest];
     }
 }
