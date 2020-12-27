@@ -2,8 +2,6 @@
 
 namespace HashArray;
 
-use RuntimeException;
-
 class TimestampHashArray implements TimestampHashArrayInterface
 {
     protected array $storage = [];
@@ -15,19 +13,14 @@ class TimestampHashArray implements TimestampHashArrayInterface
      */
     public function get(string $key, int $timestamp)
     {
-        if (!isset($this->storage[$key])) {
-            throw new RuntimeException("Could not find key '{$key}' in the HashArray");
-        }
+        $closestTime = $this->findClosest($timestamp, array_keys($this->storage[$key] ?? []));
 
-        $keyTs = $this->findClosest($timestamp, array_keys($this->storage[$key]));
-        return $this->storage[$key][$keyTs] ?? null;
+        return $this->storage[$key][$closestTime] ?? null;
     }
 
-    public function set(string $key, $value, ?int $timestamp = null): int
+    public function set(string $key, $value, ?int $timestamp = null): void
     {
-        $timestamp = $timestamp ?? time();
-        $this->storage[$key][$timestamp] = $value;
-        return $timestamp;
+        $this->storage[$key][$timestamp ?? time()] = $value;
     }
 
     private function findClosest(int $needle, array $list): ?int
@@ -42,15 +35,7 @@ class TimestampHashArray implements TimestampHashArrayInterface
         $interval = array_map($diff, $list);
         asort($interval);
         $closest = key($interval);
-//        $closest = $list[0];
-//        foreach ($list as $el) {
-//            if ($needle - $el < 0) {
-//                break;
-//            }
-//            $closest = min($closest, $el);
-//        }
-//        
-//        return $closest;
-        return $list[$closest];
+
+        return $list[$closest] ?? null;
     }
 }

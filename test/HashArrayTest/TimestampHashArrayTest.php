@@ -7,44 +7,58 @@ use PHPUnit\Framework\TestCase;
 
 class TimestampHashArrayTest extends TestCase
 {
-    public function testCreate(): void
+    private const LABEL_A = 'a';
+    
+    private function createObject(): TimestampHashArray
     {
-        $hashArray = new TimestampHashArray();
-        self::assertInstanceOf(TimestampHashArray::class, $hashArray);
+        return new TimestampHashArray();
     }
 
     public function testSimpleUsage(): void
     {
-        $hashArray = new TimestampHashArray();
+        $hashArray = $this->createObject();
         $expValue1 = 10;
         $expValue2 = 20;
-        $label = 'a';
         $t0 = 0;
         $t1 = 1;
         $t2 = 2;
 
-        $hashArray->set($label, $expValue1, $t1);
-        $hashArray->set($label, $expValue2, $t2);
+        $hashArray->set(self::LABEL_A, $expValue1, $t1);
+        $hashArray->set(self::LABEL_A, $expValue2, $t2);
 
-        self::assertEquals(null, $hashArray->get($label, $t0));
-        self::assertEquals($expValue1, $hashArray->get($label, $t1));
-        self::assertEquals($expValue2, $hashArray->get($label, $t2));
+        self::assertEquals(null, $hashArray->get(self::LABEL_A, $t0));
+        self::assertEquals($expValue1, $hashArray->get(self::LABEL_A, $t1));
+        self::assertEquals($expValue2, $hashArray->get(self::LABEL_A, $t2));
 
     }
 
     public function testWithGraterClosest(): void
     {
-        $hashArray = new TimestampHashArray();
+        $hashArray = $this->createObject();
         $expValue1 = 20;
         $expValue2 = 30;
-        $label = 'a';
         $t1 = 4;
         $t2 = 9;
 
-        $hashArray->set($label, $expValue1, $t1);
-        $hashArray->set($label, $expValue2, $t2);
+        $hashArray->set(self::LABEL_A, $expValue1, $t1);
+        $hashArray->set(self::LABEL_A, $expValue2, $t2);
 
-        self::assertEquals($expValue1, $hashArray->get($label, $t1));
-        self::assertEquals($expValue1, $hashArray->get($label, $t2 - 2));
+        self::assertEquals($expValue1, $hashArray->get(self::LABEL_A, $t1));
+        self::assertEquals($expValue1, $hashArray->get(self::LABEL_A, $t2 - 2));
+    }
+
+    public function testWithEmptyStorage(): void
+    {
+        $hashArray = $this->createObject();
+        self::assertEquals(null, $hashArray->get('a', 1));
+    }
+
+    public function testWithEarlyTimestamp(): void
+    {
+        $hashArray = $this->createObject();
+
+        $hashArray->set(self::LABEL_A, 10, 10);
+
+        self::assertEquals(null, $hashArray->get(self::LABEL_A, 1));
     }
 }
