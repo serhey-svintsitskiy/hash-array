@@ -19,12 +19,12 @@ class TimestampHashArrayTest extends TestCase
         $expValue1 = 10;
         $expValue2 = 20;
         $label = 'a';
+        $t0 = 0;
+        $t1 = 1;
+        $t2 = 2;
 
-        $t0 = time();
-        sleep(1);
-        $t1 = $hashArray->set($label, $expValue1);
-        sleep(1);
-        $t2 = $hashArray->set($label, $expValue2);
+        $hashArray->set($label, $expValue1, $t1);
+        $hashArray->set($label, $expValue2, $t2);
 
         self::assertEquals(null, $hashArray->get($label, $t0));
         self::assertEquals($expValue1, $hashArray->get($label, $t1));
@@ -35,20 +35,16 @@ class TimestampHashArrayTest extends TestCase
     public function testWithGraterClosest(): void
     {
         $hashArray = new TimestampHashArray();
-        $expValue1 = 10;
-        $expValue2 = 20;
-        $expValue3 = 30;
+        $expValue1 = 20;
+        $expValue2 = 30;
         $label = 'a';
+        $t1 = 4;
+        $t2 = 9;
 
-        $t1 = $hashArray->set($label, $expValue1);
-        sleep(3);
-        $t2 = $hashArray->set($label, $expValue2);
-        sleep(5);
-        $t3 =  $hashArray->set($label, $expValue3);
+        $hashArray->set($label, $expValue1, $t1);
+        $hashArray->set($label, $expValue2, $t2);
 
         self::assertEquals($expValue1, $hashArray->get($label, $t1));
-        self::assertEquals($expValue2, $hashArray->get($label, $t2));
-        self::assertEquals($expValue2, $hashArray->get($label, $t3 - 2));
-
+        self::assertEquals($expValue1, $hashArray->get($label, $t2 - 2));
     }
 }
